@@ -1,0 +1,145 @@
+html,body {
+    height: 100%;
+}
+.board {
+    position: relative;
+    background: #bdbdbd;
+    border-left: 3px solid white;
+    border-bottom: 3px solid #828282;
+    border-right: 3px solid #828282;
+    width: 306px;
+    height: 393px;
+}
+.wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    position: absolute;
+    background: #bdbdbd;
+    border-right: 3px solid white;
+    border-bottom: 3px solid white;
+    border-left: 3px solid #828282;
+    border-top: 3px solid #828282;
+    left: 15px;
+    top: 15px;
+    width: 270px;
+    height: 60px;
+}
+.status {
+    width: 45px;
+    height: 45px;
+    border-right: 2px solid #828282;
+    border-bottom: 2px solid #828282;
+    background: url('https://imgur.com/ssbWP2x.png');
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+.remain-flags {
+    position: absolute;
+    background: black;
+    left: 15px;
+    top: 7px;
+    width: 72px;
+    height: 43px;
+}
+.remain-flags .first{
+    position: absolute;
+    background: url('img/3.svg') no-repeat; 
+    background-size: cover;
+    right: 5px;
+    top: 3px;
+    width: 21px;
+    height: 42px;
+}
+.remain-flags .second{
+    position: absolute;
+    background: url('img/2.svg') no-repeat; 
+    background-size: cover;
+    right: 27px;
+    top: 3px;
+    width: 21px;
+    height: 42px;
+}
+.remain-flags .third{
+    position: absolute;
+    background: url('img/3.svg') no-repeat; 
+    background-size: cover;
+    right: 49px;
+    top: 3px;
+    width: 21px;
+    height: 42px;
+}
+.time {
+    background: black;
+    position: absolute;
+    left: 185px;
+    top: 7px;
+    width: 72px;
+    height: 43px;
+}
+.time .first{
+    position: absolute;
+    background-size: cover;
+    background-repeat: no-repeat;
+    right: 5px;
+    top: 3px;
+    width: 21px;
+    height: 42px;
+}
+.time .second{
+    position: absolute;
+    background: url('img/2.svg') no-repeat; 
+    background-size: cover;
+    right: 27px;
+    top: 3px;
+    width: 21px;
+    height: 42px;
+}
+.time .third{
+    position: absolute;
+    background: url('img/9.svg') no-repeat; 
+    background-size: cover;
+    right: 49px;
+    top: 3px;
+    width: 21px;
+    height: 42px;
+}
+.fields {
+    display: flex;
+    flex-wrap: wrap;
+    position: absolute;
+    border-right: 3px solid white;
+    border-bottom: 3px solid white;
+    border-left: 3px solid #828282;
+    border-top: 3px solid #828282;
+    left: 15px;
+    bottom: 15px;
+}
+.field {
+    flex-grow: 0;
+    flex-shrink: 1;
+    background: url('https://i.imgur.com/viB2aFr.png');
+    background-repeat: no-repeat;
+    background-size: cover;
+    padding: 2px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+    width: 30px;
+    height: 30px;
+}
+.field.show {
+    background: #b9b9b9;
+    border: 1px solid #828282
+}
+.field i{
+    align-self: center;
+    font-style:normal;
+    padding-left: 5px;
+}
+
+polygon {
+}
