@@ -87,6 +87,15 @@ const Handler = {
     
     status : function (event) {
                 if (event.target.matches('.status')) {
+                    document.querySelector('.status').style.borderLeft = '5px solid #828282'
+                    document.querySelector('.status').style.borderTop = '5px solid #828282'
+                    document.querySelector('.status').style.borderRight = '5px solid white'
+                    document.querySelector('.status').style.borderBottom = '5px solid white'
+                    setTimeout(()=>{
+                        document.querySelector('.status').style.borderLeft = '5px solid white'
+                        document.querySelector('.status').style.borderTop = '5px solid white'
+                        document.querySelector('.status').style.borderRight = '5px solid #828282'
+                        document.querySelector('.status').style.borderBottom = '5px solid #828282'}, 200)
                     controller.createGame(GAME.difficulty.height, GAME.difficulty.width, GAME.difficulty.mines)
                 }    
             },
