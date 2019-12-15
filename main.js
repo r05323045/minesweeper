@@ -89,13 +89,13 @@ const Handler = {
             },
     difficulty : function (event) {
                     if (event.target.matches('.nav-link')) {
-                        console.log(event.target.textContent)
                         switch (event.target.textContent){
                             case 'beginner':
                                 GAME.difficulty.custom = false
                                 GAME.difficulty.height = 9
                                 GAME.difficulty.width = 9
                                 GAME.difficulty.mines = 10
+                                controller.resetTime()
                                 controller.createGame(GAME.difficulty.height, GAME.difficulty.width, GAME.difficulty.mines)
                                 break;
                             case 'intermediate':
@@ -103,6 +103,7 @@ const Handler = {
                                 GAME.difficulty.height = 16
                                 GAME.difficulty.width = 16
                                 GAME.difficulty.mines = 40
+                                controller.resetTime()
                                 controller.createGame(GAME.difficulty.height, GAME.difficulty.width, GAME.difficulty.mines)
                                 break;
                             case 'expert':
@@ -110,6 +111,7 @@ const Handler = {
                                 GAME.difficulty.height = 16
                                 GAME.difficulty.width = 30
                                 GAME.difficulty.mines = 99
+                                controller.resetTime()
                                 controller.createGame(GAME.difficulty.height, GAME.difficulty.width, GAME.difficulty.mines)
                                 break;
                             case 'custom':
@@ -122,7 +124,6 @@ const Handler = {
                     }
             },
     submitCustom : function(event) {
-                    console.log(GAME.difficulty.custom)
                     if (event.target.matches('.confirm') && GAME.difficulty.custom === true) {
                         let inputHeight = document.querySelector('#pills-custom').querySelector('.height').value
                         let inputWidth = document.querySelector('#pills-custom').querySelector('.width').value
@@ -144,13 +145,13 @@ const Handler = {
                         } else if (inputMines > (inputHeight * inputWidth - 1)) {
                             inputMines = (inputHeight * inputWidth - 1)
                         }
-                        console.log(inputHeight, inputWidth, inputMines)
                         GAME.difficulty.height = inputHeight
                         GAME.difficulty.width = inputWidth
                         GAME.difficulty.mines = inputMines
                         document.querySelector('#pills-custom').querySelector('.height').value = inputHeight
                         document.querySelector('#pills-custom').querySelector('.width').value = inputWidth
                         document.querySelector('#pills-custom').querySelector('.mines').value = inputMines
+                        controller.resetTime()
                         controller.createGame(GAME.difficulty.height, GAME.difficulty.width, GAME.difficulty.mines)
                     }
                     $("#difficulty").modal("hide"); 
@@ -174,7 +175,7 @@ const Handler = {
     fieldContextmenu : function (event) {
                             event.preventDefault()
                             const fieldIdx = Number(event.target.id)
-                            if (event.target.matches('.field') && model.fields[field].isDigged === false) {
+                            if (event.target.matches('.field') && model.fields[fieldIdx].isDigged === false) {
                                 switch (GAME.state) {
                                     case 'beginning':
                                     case 'firstClick':
@@ -425,7 +426,6 @@ const utility = {
      *     - [3, 1]
     */
     getRandomNumberArray(height, width, len) {
-        console.log(height, width)
         const number = []
         for (let i = 0; i < len; i++) {
             const random = Math.floor(Math.random() * height * width)
