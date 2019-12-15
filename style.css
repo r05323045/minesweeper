@@ -1,14 +1,56 @@
 html,body {
     height: 100%;
 }
+.container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+}
+.difficulty {
+    width: 550px;
+}
+.difficulty .choose{
+    border-radius: 20px;
+    margin-bottom: 20px;
+}
+.difficulty .card {
+    border-radius: 20px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+.difficulty .card-body {
+    text-align: center;
+}
+.difficulty .card-body .btn {
+    margin: 10px 10px;
+    border-radius: 20px;
+}
+.difficulty .card-footer {
+    height: 60px;
+}
+.difficulty .card-footer .btn {
+    position: absolute;
+    border-radius: 20px;
+    right: 10%;
+}
+
+.difficulty .form-control {
+    margin: auto;
+    text-align: center;
+    width: 100px;
+}
 .board {
+    align-self: center;
     position: relative;
     background: #bdbdbd;
     border-left: 3px solid white;
     border-bottom: 3px solid #828282;
     border-right: 3px solid #828282;
+    box-sizing: border-box;
     width: 306px;
-    height: 393px;
+    height: 380px;
 }
 .wrapper {
     display: flex;
@@ -21,89 +63,97 @@ html,body {
     border-bottom: 3px solid white;
     border-left: 3px solid #828282;
     border-top: 3px solid #828282;
+    box-sizing: border-box;
     left: 15px;
     top: 15px;
-    width: 270px;
+    width: 276px;
     height: 60px;
 }
 .status {
     width: 45px;
     height: 45px;
-    border-right: 2px solid #828282;
-    border-bottom: 2px solid #828282;
-    background: url('https://imgur.com/ssbWP2x.png');
+    border-left: 5px solid white;
+    border-top: 5px solid white;
+    border-right: 5px solid #828282;
+    border-bottom: 5px solid #828282;
+    background: url('resource/status/continue');
     background-repeat: no-repeat;
     background-size: cover;
+    box-sizing: border-box;
 }
 .remain-flags {
     position: absolute;
     background: black;
     left: 15px;
-    top: 7px;
+    top: 6px;
     width: 72px;
     height: 43px;
+    box-sizing: border-box;
 }
 .remain-flags .first{
     position: absolute;
-    background: url('img/3.svg') no-repeat; 
+    background: url('img/5.svg'); 
+    background-repeat: no-repeat;
     background-size: cover;
     right: 5px;
     top: 3px;
     width: 21px;
     height: 42px;
+    box-sizing: border-box;
 }
 .remain-flags .second{
     position: absolute;
-    background: url('img/2.svg') no-repeat; 
+    background: url('img/5.svg'); 
+    background-repeat: no-repeat;
     background-size: cover;
     right: 27px;
     top: 3px;
     width: 21px;
     height: 42px;
+    box-sizing: border-box;
 }
 .remain-flags .third{
     position: absolute;
-    background: url('img/3.svg') no-repeat; 
+    background: url('img/5.svg'); 
+    background-repeat: no-repeat;
     background-size: cover;
     right: 49px;
     top: 3px;
     width: 21px;
     height: 42px;
+    box-sizing: border-box;
 }
 .time {
     background: black;
     position: absolute;
-    left: 185px;
-    top: 7px;
+    right: 15px;
+    top: 6px;
     width: 72px;
     height: 43px;
 }
 .time .first{
     position: absolute;
-    background-size: cover;
-    background-repeat: no-repeat;
     right: 5px;
     top: 3px;
     width: 21px;
     height: 42px;
+    box-sizing: border-box;
 }
 .time .second{
     position: absolute;
-    background: url('img/2.svg') no-repeat; 
-    background-size: cover;
     right: 27px;
     top: 3px;
     width: 21px;
     height: 42px;
+    box-sizing: border-box;
 }
 .time .third{
     position: absolute;
-    background: url('img/9.svg') no-repeat; 
-    background-size: cover;
     right: 49px;
     top: 3px;
     width: 21px;
     height: 42px;
+    box-sizing: border-box;
 }
 .fields {
     display: flex;
@@ -115,31 +165,26 @@ html,body {
     border-top: 3px solid #828282;
     left: 15px;
     bottom: 15px;
+    width: 100%;
 }
 .field {
-    flex-grow: 0;
-    flex-shrink: 1;
-    background: url('https://i.imgur.com/viB2aFr.png');
+    background: #b9b9b9;
+    border-left: 3px solid white;
+    border-top: 3px solid white;
+    border-right: 3px solid #828282;
+    border-bottom: 3px solid #828282;
     background-repeat: no-repeat;
     background-size: cover;
-    padding: 2px;
     box-sizing: border-box;
-    display: flex;
     flex-direction: column;
     justify-content: center;
     text-align: center;
     width: 30px;
     height: 30px;
+    box-sizing: border-box;
 }
 .field.show {
     background: #b9b9b9;
-    border: 1px solid #828282
-}
-.field i{
-    align-self: center;
-    font-style:normal;
-    padding-left: 5px;
-}
-
-polygon {
+    border: 1px solid #828282;
+    box-sizing: border-box;
 }

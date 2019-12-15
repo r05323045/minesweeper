@@ -4,27 +4,131 @@
             <meta charset="utf-8">
             <meta name="viewport" content="width=device-width,initial-scale=1.0">
             <title>踩地雷</title>
-            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css">
-            <link rel="stylesheet" href="../style.css"/>
-            <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+            <link rel="stylesheet" href="style.css"/>
+            <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
         </head>
         <body>
-            <div class="board">
-                <div class="wrapper">
-                    <div class="remain-flags">
-                        <div class="first"></div>
-                        <div class="second"></div>
-                        <div class="third" style="background: url('img/6.svg')"></div>
-                    </div>
-                    <div class="status"></div>
-                    <div class="time">
-                        <div class="first"></div>
-                        <div class="second"></div>
-                        <div class="third"></div>
+            <div class="container">
+                <div class="difficulty">
+                    <button class="btn btn-dark choose" data-toggle="collapse" data-target="#difficulty">選擇難度</button>
+                    <div class="collapse" id="difficulty">
+                        <div class="card mx-auto">
+                            <div class="card-body">
+                                <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+                                    <li class="nav-item">
+                                        <a class="nav-link btn btn-outline-dark active" data-toggle="pill" href="#pills-beginner">beginner</a>
+                                    </li>
+                                    <li class="nav-item">
+                                            <a class="nav-link btn btn-outline-dark" data-toggle="pill" href="#pills-intermediate">intermediate</a>
+                                    </li>
+                                    <li class="nav-item">
+                                            <a class="nav-link btn btn-outline-dark" data-toggle="pill" href="#pills-expert">expert</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link btn btn-outline-dark" data-toggle="pill" href="#pills-custom">custom</a>
+                                    </li>
+                                </ul>
+                                <div class="tab-content" id="pills-tabContent">
+                                    <div class="tab-pane fade show active" id="pills-beginner">
+                                        <table class="table">
+                                            <thead>
+                                                <tr>
+                                                    <th scope="col">Height</th>
+                                                    <th scope="col">Width</th>
+                                                    <th scope="col">Mines</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td>9</td>
+                                                    <td>9</td>
+                                                    <td>10</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <div class="tab-pane fade" id="pills-intermediate">
+                                        <table class="table">
+                                            <thead>
+                                                <tr>
+                                                    <th scope="col">Height</th>
+                                                    <th scope="col">Width</th>
+                                                    <th scope="col">Mines</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td>16</td>
+                                                    <td>16</td>
+                                                    <td>40</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <div class="tab-pane fade" id="pills-expert">
+                                        <table class="table">
+                                            <thead>
+                                                <tr>
+                                                    <th scope="col">Height</th>
+                                                    <th scope="col">Width</th>
+                                                    <th scope="col">Mines</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td>16</td>
+                                                    <td>30</td>
+                                                    <td>99</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <div class="tab-pane fade" id="pills-custom">
+                                        <table class="table">
+                                            <thead>
+                                                <tr>
+                                                    <th scope="col">Height</th>
+                                                    <th scope="col">Width</th>
+                                                    <th scope="col">Mines</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td><input type="text" class="height form-control"></td>
+                                                    <td><input type="text" class="width form-control"></td>
+                                                    <td><input type="text" class="mines form-control"></td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-footer">
+                                <button type="submit" class="btn btn-dark confirm" data-toggle="collapse" data-target="#difficulty">確認</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div class="fields"></div>
+                <div class="board">
+                    <div class="wrapper">
+                        <div class="remain-flags">
+                            <div class="first" style="background: url('resource/digital_number/0.svg') center center / cover no-repeat"></div>
+                            <div class="second" style="background: url('resource/digital_number/0.svg') center center / cover no-repeat"></div>
+                            <div class="third" style="background: url('resource/digital_number/0.svg') center center / cover no-repeat"></div>
+                        </div>
+                        <div class="status" style="background: url('resource/status/continue.gif') center center / cover no-repeat"></div>
+                        <div class="time">
+                            <div class="first" style="background: url('resource/digital_number/0.svg') center center / cover no-repeat"></div>
+                            <div class="second" style="background: url('resource/digital_number/0.svg') center center / cover no-repeat"></div>
+                            <div class="third" style="background: url('resource/digital_number/0.svg') center center / cover no-repeat"></div>
+                        </div>
+                    </div>
+                    <div class="fields"></div>
+                </div>
             </div>
-            <script src="../main.js"></script>
+            <script src="main.js"></script>
+            <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+            <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
         </body>
     </html>

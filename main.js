@@ -2,15 +2,19 @@
  * Timer
  * 用來控制view.renderTime的setInterval函式
  */
-let Timer
+const GAME = {timer: ()=>{}, state: 'initial', difficulty: {height: 16, width: 30, mines: 99, custom: false}}
 const view = {
     /**
      * displayFields()
      * 顯示踩地雷的遊戲版圖在畫面上，輸入的 rows 是指版圖的行列數。
      */
-    displayFields(rows) {
-        document.querySelector('.fields').innerHTML = Array.from(Array(Math.pow(rows, 2)).keys()).map(index => `<div class="field" id="${index}"><i></i></div>`).join('')
-        document.querySelector('.fields').style.width = `${rows * 30}px`
+    displayFields(rows, cols) {
+        document.querySelector('.status').style.background = `url('resource/status/continue.gif') center center / cover no-repeat`
+        document.querySelector('.fields').innerHTML = Array.from(Array(rows * cols).keys()).map(index => `<div class="field" id="${index}"></div>`).join('')
+        document.querySelector('.board').style.width = `${cols * 30 + 36}px`
+        document.querySelector('.board').style.height = `${rows * 30 + 111}px`
+        document.querySelector('.wrapper').style.width = `${cols * 30 + 6}px`
+        document.querySelector('.fields').style.width = `${cols * 30 + 6}px`
     },
     /**
      * showFieldContent()
@@ -19,9 +23,10 @@ const view = {
     showFieldContent(field) {
         field = Number(field)
         if (model.isMine(field)) {
-            document.getElementById(`${field}`).innerHTML =  `<i class="fas fa-bomb"></i>`
+            document.getElementById(`${field}`).style.background = `url('resource/mine/normal.png') center center / cover no-repeat`
+            document.getElementById(`${field}`).classList.add('show')
         } else {
-            document.getElementById(`${field}`).innerHTML =  `<i>${model.fields[field].number}</i>`
+            document.getElementById(`${field}`).style.background = `url('resource/field_number/${model.fields[field].number}.gif') center center / cover no-repeat`
             document.getElementById(`${field}`).classList.add('show')
         } 
     },
@@ -30,74 +35,211 @@ const view = {
      * 顯示經過的遊戲時間在畫面上。
      */
     renderTime(time) {
-        /*
-        Timer = setInterval(function() {
-                    const now = new Date().getTime()
-                    const distance = now - time
-                    const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
-                    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60))
-                    const seconds = Math.floor((distance % (1000 * 60)) / 1000)
-                    document.querySelector('.time').innerHTML = `你已經用了  ${hours}h ${minutes}m ${seconds}s`
-                }, 1000)
-        */
-       document.querySelector('.time .first').style.background = "url('../img/0.svg')"
+        GAME.timer = setInterval(function() {
+                        const now = new Date().getTime()
+                        const distance = now - time
+                        const seconds = Math.floor((distance / 1000))
+                        const secondsList = seconds.toString().split('')
+                        document.querySelector('.time .first').style.background = `url('resource/digital_number/${Number(secondsList[secondsList.length - 1])}.svg') center center / cover no-repeat`
+                        if (seconds >= 10) {
+                            document.querySelector('.time .second').style.background = `url('resource/digital_number/${Number(secondsList[secondsList.length - 2])}.svg') center center / cover no-repeat`
+                        }
+                        if (seconds >= 100) {
+                            document.querySelector('.time .third').style.background = `url('resource/digital_number/${Number(secondsList[secondsList.length - 3])}.svg') center center / cover no-repeat`  
+                        }
+                    }, 1000)
+    },
+    renderFlagNumber() {
+        const remainFlagsList = model.remainFlags.toString().split('')
+        document.querySelector('.remain-flags .first').style.background = `url('resource/digital_number/${Number(remainFlagsList[remainFlagsList.length - 1])}.svg') center center / cover no-repeat`
+        document.querySelector('.remain-flags .second').style.background = `url('resource/digital_number/0.svg') center center / cover no-repeat`
+        document.querySelector('.remain-flags .third').style.background = `url('resource/digital_number/0.svg') center center / cover no-repeat`
+        if (model.remainFlags < 0) {
+            document.querySelector('.remain-flags .third').style.background = `url('resource/digital_number/minus.svg') center center / cover no-repeat`
+        }
+        if (Math.abs(model.remainFlags) >= 10) {
+            document.querySelector('.remain-flags .second').style.background = `url('resource/digital_number/${Number(remainFlagsList[remainFlagsList.length - 2])}.svg') center center / cover no-repeat`
+        }
+        if (Math.abs(model.remainFlags) >= 100) {
+            document.querySelector('.remain-flags .third').style.background = `url('resource/digital_number/${Number(remainFlagsList[remainFlagsList.length - 3])}.svg') center center / cover no-repeat`  
+        }
     },
     /**
-     * showBoard()
-     * 遊戲結束時將遊戲的全部格子內容顯示出來。
+     * showMines()
+     * 遊戲結束時將遊戲的全部炸彈顯示出來。
      */
-    showBoard() {
-        document.querySelectorAll('.field').forEach(field => {view.showFieldContent(field.id)})
+    showMines(mineIdx) {
+        document.querySelectorAll('.field').forEach(field => {
+            if (model.isMine(field.id)) {
+                view.showFieldContent(field.id)
+            }  
+        })
+        document.getElementById(`${mineIdx}`).style.background = `url('resource/mine/explode.png') center center / cover no-repeat`
     }
   }
-  
-  const controller = {
+
+const Handler = { 
+    
+    status : function (event) {
+                if (event.target.matches('.status')) {
+                    controller.createGame(GAME.difficulty.height, GAME.difficulty.width, GAME.difficulty.mines)
+                    controller.resetTime()
+                }    
+            },
+    difficulty : function (event) {
+                    if (event.target.matches('.nav-link')) {
+                        console.log(event.target.textContent)
+                        switch (event.target.textContent){
+                            case 'beginner':
+                                GAME.difficulty.custom = false
+                                GAME.difficulty.height = 9
+                                GAME.difficulty.width = 9
+                                GAME.difficulty.mines = 10
+                                controller.createGame(GAME.difficulty.height, GAME.difficulty.width, GAME.difficulty.mines)
+                                break;
+                            case 'intermediate':
+                                GAME.difficulty.custom = false
+                                GAME.difficulty.height = 16
+                                GAME.difficulty.width = 16
+                                GAME.difficulty.mines = 40
+                                controller.createGame(GAME.difficulty.height, GAME.difficulty.width, GAME.difficulty.mines)
+                                break;
+                            case 'expert':
+                                GAME.difficulty.custom = false
+                                GAME.difficulty.height = 16
+                                GAME.difficulty.width = 30
+                                GAME.difficulty.mines = 99
+                                controller.createGame(GAME.difficulty.height, GAME.difficulty.width, GAME.difficulty.mines)
+                                break;
+                            case 'custom':
+                                GAME.difficulty.custom = true
+                                GAME.difficulty.height = document.querySelector('#pills-custom').querySelector('.height').value
+                                GAME.difficulty.width = document.querySelector('#pills-custom').querySelector('.width').value
+                                GAME.difficulty.mines = document.querySelector('#pills-custom').querySelector('.mines').value
+                                break;
+                        }
+                    }
+            },
+    submitCustom : function(event) {
+                    console.log(GAME.difficulty.custom)
+                    if (event.target.matches('.confirm') && GAME.difficulty.custom === true) {
+                        let inputHeight = document.querySelector('#pills-custom').querySelector('.height').value
+                        let inputWidth = document.querySelector('#pills-custom').querySelector('.width').value
+                        let inputMines = document.querySelector('#pills-custom').querySelector('.mines').value
+                        if (isNaN(inputHeight) || inputHeight < 9) {
+                            inputHeight = 9
+                        } else if (inputHeight > 16) {
+                            inputHeight = 16
+                        }
+                        if (isNaN(inputWidth) || inputWidth < 9) {
+                            inputWidth = 9
+                        } else if (inputWidth > 30) {
+                            inputHeight = 30
+                        }
+                        if (isNaN(inputMines)) {
+                            inputMines = Math.floor(Math.random() * (inputHeight * inputWidth - 1) + 1)
+                        } else if (inputMines < 1) {
+                            inputMines = 1
+                        } else if (inputMines > (inputHeight * inputWidth - 1)) {
+                            inputMines = (inputHeight * inputWidth - 1)
+                        }
+                        console.log(inputHeight, inputWidth, inputMines)
+                        GAME.difficulty.height = inputHeight
+                        GAME.difficulty.width = inputWidth
+                        GAME.difficulty.mines = inputMines
+                        document.querySelector('#pills-custom').querySelector('.height').value = inputHeight
+                        document.querySelector('#pills-custom').querySelector('.width').value = inputWidth
+                        document.querySelector('#pills-custom').querySelector('.mines').value = inputMines
+                        controller.createGame(GAME.difficulty.height, GAME.difficulty.width, GAME.difficulty.mines)
+                    }
+                },
+    fieldClick : function (event) {
+                    if (event.target.matches('.field')) {
+                        switch (GAME.state) {
+                            case 'beginning':
+                                controller.dig(event.target.id)
+                                const startTime = new Date().getTime()
+                                view.renderTime(startTime)
+                                break;
+                            case 'firstClick':
+                                controller.dig(event.target.id)
+                                break;
+                            case 'gameOver':
+                                break;
+                        }
+                    }  
+                },
+    fieldContextmenu : function (event) {
+                            event.preventDefault()
+                            const fieldIdx = Number(event.target.id)
+                            if (event.target.matches('.field') && model.fields[field].isDigged === false) {
+                                switch (GAME.state) {
+                                    case 'beginning':
+                                    case 'firstClick':
+                                        if (document.getElementById(`${fieldIdx}`).matches('.flag')) {
+                                            document.getElementById(`${fieldIdx}`).style.background = ""
+                                            document.getElementById(`${fieldIdx}`).classList.remove('flag')
+                                            model.remainFlags += 1
+                                            view.renderFlagNumber()
+                                        } else {
+                                            document.getElementById(`${fieldIdx}`).style.background = `url('resource/flag.gif') center center / cover no-repeat`
+                                            document.getElementById(`${fieldIdx}`).classList.add('flag')
+                                            model.remainFlags -= 1
+                                            view.renderFlagNumber()
+                                        }
+                                        break;
+                                    case 'gameOver':
+                                        break;
+                                } 
+                            }    
+                        },
+}
+
+const controller = {
+      
     /**
      * createGame()
      * 根據參數決定遊戲版圖的行列數，以及地雷的數量
      */
-    createGame(numberOfRows, numberOfMines) {
-        //1. 顯示遊戲畫面
-        view.displayFields(numberOfRows)
-        //2. 遊戲計時
-        const startTime = new Date().getTime()
-        view.renderTime(startTime)
-        //3. 埋地雷
-        controller.setMinesAndFields(numberOfRows, numberOfMines)
-        //4. 綁定事件監聽器到格子上
-        document.querySelectorAll('.field').forEach(field => {
-            field.addEventListener('click', event => {
-                if (event.target.matches('.field')) {
-                    controller.dig(event.target.id)
-                } else if (event.target.matches('.fas')) {
-                    controller.dig(event.target.parentElement.id)
-                }
-            })
-            field.addEventListener('contextmenu', event => {
-                event.preventDefault()
-                if (event.target.matches('.field')) {
-                    const field = Number(event.target.id)
-                    if (model.fields[field].isDigged === false) {
-                        document.getElementById(`${field}`).children[0].className = 'fas fa-flag'
-                    }
-                } 
-            })
-        })
+    createGame(numberOfRows, numberOfCols, numberOfMines) {
+        GAME.state = 'beginning'
+        //1. 避免重複監聽
+        clearInterval(GAME.timer)
+        document.querySelector('.nav-pills').removeEventListener('click', Handler.difficulty, false)
+        document.querySelector('.card-footer').removeEventListener('click', Handler.submitCustom, false)
+        document.querySelector('.nav-pills').addEventListener('click', Handler.difficulty)
+        document.querySelector('.card-footer').addEventListener('click', Handler.submitCustom)
+        //2. 顯示遊戲畫面
+        view.displayFields(numberOfRows, numberOfCols)
+        //3. 避免重複監聽
+        document.querySelector('.wrapper').removeEventListener('click', Handler.status, false)
+        document.querySelector('.fields').removeEventListener('click', Handler.fieldClick, false)
+        document.querySelector('.fields').removeEventListener('contextmenu', Handler.fieldContextmenu, false)
+        //3. 遊戲計時
+        document.querySelector('.wrapper').addEventListener('click', Handler.status)
+        //4. 埋地雷
+        controller.setMinesAndFields(numberOfRows, numberOfCols, numberOfMines)
+        view.renderFlagNumber()
+        //5. 綁定事件監聽器到格子上
+        document.querySelector('.fields').addEventListener('click', Handler.fieldClick)
+        document.querySelector('.fields').addEventListener('contextmenu', Handler.fieldContextmenu)
     },
     
     /**
      * setMinesAndFields()
      * 設定格子的內容，以及產生地雷的編號。
      */
-    setMinesAndFields(numberOfRows, numberOfMines) {
+    setMinesAndFields(numberOfRows, numberOfCols, numberOfMines) {
 
         //1. 產生地雷編號
-        model.mines = utility.getRandomNumberArray(numberOfMines, numberOfRows)
+        model.mines = utility.getRandomNumberArray(numberOfRows, numberOfCols, numberOfMines)
         //2. 產生空格子
-        model.fields = Array(Math.pow(numberOfRows, 2)).fill().map(el => {return {number: el, isDigged: false}}) //要用map的原因https://stackoverflow.com/questions/35578478/array-prototype-fill-with-object-passes-reference-and-not-new-instance
+        model.fields = Array(numberOfRows * numberOfCols).fill().map(el => {return {number: el, isDigged: false}}) //要用map的原因https://stackoverflow.com/questions/35578478/array-prototype-fill-with-object-passes-reference-and-not-new-instance
         //3. 設定格子內容
         model.fields.forEach((el, idx) => {controller.getFieldData(idx)})
-        //4. 後台檢查
+        //4. 設定旗子數量
+        model.remainFlags = model.mines.length
+        //5. 後台檢查
         utility.deBug()
         
     },
@@ -109,19 +251,20 @@ const view = {
      * （計算周圍地雷的數量）
      */
     getFieldData(fieldIdx) {
-        const numberOfRows = Math.sqrt(model.fields.length)
+        const numberOfRows = GAME.difficulty.height
+        const numberOfCols = GAME.difficulty.width
         if (model.isMine(fieldIdx)) {
             model.fields[fieldIdx]['number'] = '*'
         } else {
-            const fieldRow = Math.floor(fieldIdx / numberOfRows)
-            const fieldCol = fieldIdx % numberOfRows
+            const fieldRow = Math.floor(fieldIdx / numberOfCols)
+            const fieldCol = fieldIdx % numberOfCols
             const range = []
             for (let i = -1; i < 2; i++) {
                 for (let j = -1; j < 2; j++) {
                     const row = fieldRow + i
                     const col = fieldCol + j
-                    if (row >= 0 && row < numberOfRows && col >= 0 && col < numberOfRows) { 
-                        range.push(row * numberOfRows + col)
+                    if (row >= 0 && row < numberOfRows && col >= 0 && col < numberOfCols) { 
+                        range.push(row * numberOfCols + col)
                     }
                 }
             }
@@ -129,7 +272,7 @@ const view = {
             range.forEach(index => {
                 count = model.isMine(index) ?  count + 1 : count
             })
-            model.fields[fieldIdx]['number'] = count > 0 ? count : ''
+            model.fields[fieldIdx]['number'] = count
         }
         
     },
@@ -141,17 +284,38 @@ const view = {
      * 如果是地雷      => 遊戲結束
      */
     dig(field) {
-        const numberOfRows = Math.sqrt(model.fields.length)
         field = Number(field)
         model.fields[field].isDigged = true
-        view.showFieldContent(field)
-        if (model.isMine(field)) {
-            controller.gameOver()
-        } else if (model.fields.filter(field => field.isDigged).length === model.fields.length - model.mines.length) {
-            controller.victory()
-        } else if (model.fields[field].number === ''){
-            controller.spreadOcean(field, numberOfRows)
-        } 
+        const numberOfRows = GAME.difficulty.height
+        switch (GAME.state) {
+            case 'beginning':
+                GAME.state = 'firstClick'
+                if (model.isMine(field)) {
+                    controller.createGame(GAME.difficulty.height, GAME.difficulty.width, GAME.difficulty.mines)
+                    controller.dig(field)
+                } 
+                else if (model.fields.filter(field => field.isDigged).length === model.fields.length - model.mines.length) {
+                    controller.victory()
+                } 
+                else if (model.fields[field].number === 0){
+                    controller.spreadOcean(field)
+                }
+                view.showFieldContent(field) 
+                break;
+            case 'firstClick':
+                view.showFieldContent(field)
+                if (model.isMine(field)) {
+                    controller.gameOver(field) 
+                } 
+                else if (model.fields.filter(field => field.isDigged).length === model.fields.length - model.mines.length) {
+                    controller.victory()
+                } 
+                else if (model.fields[field].number === 0){
+                    controller.spreadOcean(field, numberOfRows)
+                } 
+                break;
+            }
+        
     },
     /**
      * spreadOcean()
@@ -159,24 +323,25 @@ const view = {
      */
     spreadOcean(field) {
         field = Number(field)
-        const numberOfRows = Math.sqrt(model.fields.length)
-        const fieldRow = Math.floor(field / numberOfRows)
-        const fieldCol = field % numberOfRows
+        const numberOfRows = GAME.difficulty.height
+        const numberOfCols = GAME.difficulty.width
+        const fieldRow = Math.floor(field / numberOfCols)
+        const fieldCol = field % numberOfCols
         const range = []
         for (let i = -1; i < 2; i++) {
             for (let j = -1; j < 2; j++) {
                 if (Math.abs(i) !== Math.abs(j)) {
                     const row = fieldRow + i
                     const col = fieldCol + j
-                    if (row >= 0 && row < numberOfRows && col >= 0 && col < numberOfRows) { 
-                        range.push(row * numberOfRows + col)
+                    if (row >= 0 && row < numberOfRows && col >= 0 && col < numberOfCols) { 
+                        range.push(row * numberOfCols + col)
                     }
                 } 
             }
         }
         range.forEach(index => {
             if (model.fields[index].isDigged === false) {
-                controller.dig(index, numberOfRows)
+                controller.dig(index)
             }
         })
     },
@@ -185,23 +350,28 @@ const view = {
      * 跳出勝利alert
      */
     victory() {
-        //使用SweetAlert套件http://lipis.github.io/bootstrap-sweetalert/
-        swal({
-            title: "Victory",
-            button: "play again",
+        document.querySelector('.status').style.background = `url('resource/status/vicotory.gif') center center / cover no-repeat`
+        GAME.state = 'gameOver'
+        document.querySelectorAll('.field').forEach(field => {
+            if (model.isMine(field.id)) {
+                document.getElementById(`${field.id}`).style.background = `url('resource/flag.gif') center center / cover no-repeat`
+            }  
         })
-        .then(() => {
-            controller.createGame(9, 10)
-        })
-        clearInterval(Timer)
+        model.remainFlags = 0
+        view.renderFlagNumber()
+        setTimeout(()=>{clearInterval(GAME.timer)}, 500)
     },
     /**
      * gameOver()
      * 跳出遊戲結束alert
      */
-    gameOver() {
-        view.showBoard()
+    gameOver(field) {
+        document.querySelector('.status').style.background = `url('resource/status/gameover.gif') center center / cover no-repeat`
+        view.showMines(field)
+        clearInterval(GAME.timer)
+        GAME.state = 'gameOver'
         //使用SweetAlert套件http://lipis.github.io/bootstrap-sweetalert/
+        /*
         swal({
             title: "Game Over",
             button: "restart",
@@ -209,11 +379,17 @@ const view = {
         .then(() => {
             controller.createGame(9, 10)
         })
-        clearInterval(Timer)
-    }
+        */
+    },
+    resetTime() {
+        clearInterval(GAME.timer)
+        document.querySelector('.time .first').style.background = `url('resource/digital_number/0.svg') center center / cover no-repeat`
+        document.querySelector('.time .second').style.background = `url('resource/digital_number/0.svg') center center / cover no-repeat`
+        document.querySelector('.time .third').style.background = `url('resource/digital_number/0.svg') center center / cover no-repeat`  
+    },
   }
   
-  const model = {
+const model = {
     /**
      * mines
      * 存放地雷的編號（第幾個格子）
@@ -225,28 +401,33 @@ const view = {
      * {number: 1, isDigged: false}
      */
     fields: [],
+
+    remainFlags: Number,
   
     /**
      * isMine()
      * 輸入一個格子編號，並檢查這個編號是否是地雷
      */
     isMine(fieldIdx) {
+        fieldIdx = Number(fieldIdx)
         return this.mines.includes(fieldIdx)
     }
   }
   
-  const utility = {
+const utility = {
     /**
-     * getRandomNumberArray(len, count)
-     * 取得一個範圍從 0 到 count參數、長度為 len參數的數字陣列。
+     * getRandomNumberArray(len, height, width)
+     * 取得一個範圍從 0 到 height, width參數、長度為 len參數的數字陣列。
      * 例如：
-     *   getRandomNumberArray(2, 4)
+     *   getRandomNumberArray(2, 4, 4)
      *     - [3, 1]
     */
-    getRandomNumberArray(len, count) {
+    getRandomNumberArray(height, width, len) {
+        console.log(height, width)
         const number = []
         for (let i = 0; i < len; i++) {
-            const random = Math.floor(Math.random() * Math.pow(count, 2))
+            const random = Math.floor(Math.random() * height * width)
+            
             if (number.includes(random) === false) {
                 number.push(random)
             } else { i -= 1}
@@ -258,11 +439,12 @@ const view = {
      * 將array轉換成matrix
     */
     deBug() {
-        const numberOfRows = Math.sqrt(model.fields.length)
+        const numberOfRows = GAME.difficulty.height
+        const numberOfCols = GAME.difficulty.width
         const check = []
-        Array.from(Array(numberOfRows).keys()).forEach(i => check.push(model.fields.slice(i * numberOfRows, (i+1) * numberOfRows).map(i => i.number)))
+        Array.from(Array(numberOfRows).keys()).forEach(i => check.push(model.fields.slice(i * numberOfCols, (i+1) * numberOfCols).map(i => i.number)))
         console.table(check)
     }
   }
 
-controller.createGame(9, 10)
+controller.createGame(9, 9, 10)
