@@ -193,3 +193,6 @@ html,body {
     border: 1px solid #828282;
     box-sizing: border-box;
 }
+footer {
+    text-align: center;
+}
