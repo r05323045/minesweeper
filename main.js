@@ -79,12 +79,15 @@ const view = {
     }
   }
 
+    /**
+     * Handler
+     * 為了方便新增與移除監聽器，將監聽器儲存在物件中
+     */
 const Handler = { 
     
     status : function (event) {
                 if (event.target.matches('.status')) {
                     controller.createGame(GAME.difficulty.height, GAME.difficulty.width, GAME.difficulty.mines)
-                    controller.resetTime()
                 }    
             },
     difficulty : function (event) {
@@ -95,7 +98,6 @@ const Handler = {
                                 GAME.difficulty.height = 9
                                 GAME.difficulty.width = 9
                                 GAME.difficulty.mines = 10
-                                controller.resetTime()
                                 controller.createGame(GAME.difficulty.height, GAME.difficulty.width, GAME.difficulty.mines)
                                 break;
                             case 'intermediate':
@@ -103,7 +105,6 @@ const Handler = {
                                 GAME.difficulty.height = 16
                                 GAME.difficulty.width = 16
                                 GAME.difficulty.mines = 40
-                                controller.resetTime()
                                 controller.createGame(GAME.difficulty.height, GAME.difficulty.width, GAME.difficulty.mines)
                                 break;
                             case 'expert':
@@ -111,7 +112,6 @@ const Handler = {
                                 GAME.difficulty.height = 16
                                 GAME.difficulty.width = 30
                                 GAME.difficulty.mines = 99
-                                controller.resetTime()
                                 controller.createGame(GAME.difficulty.height, GAME.difficulty.width, GAME.difficulty.mines)
                                 break;
                             case 'custom':
@@ -207,7 +207,7 @@ const controller = {
     createGame(numberOfRows, numberOfCols, numberOfMines) {
         GAME.state = 'beginning'
         //1. 避免重複監聽
-        clearInterval(GAME.timer)
+        controller.resetTime()
         document.querySelector('.nav-pills').removeEventListener('click', Handler.difficulty, false)
         document.querySelector('.card-footer').removeEventListener('click', Handler.submitCustom, false)
         document.querySelector('.nav-pills').addEventListener('click', Handler.difficulty)
@@ -227,7 +227,51 @@ const controller = {
         document.querySelector('.fields').addEventListener('click', Handler.fieldClick)
         document.querySelector('.fields').addEventListener('contextmenu', Handler.fieldContextmenu)
     },
-    
+    /**
+     * savePlayer()
+     * 拯救第一次就踩到炸彈的玩家
+     */
+    savePlayer(numberOfRows, numberOfCols, numberOfMines, selectMine) {
+        GAME.state = 'beginning'
+        //1. 避免重複監聽
+        controller.resetTime()
+        document.querySelector('.nav-pills').removeEventListener('click', Handler.difficulty, false)
+        document.querySelector('.card-footer').removeEventListener('click', Handler.submitCustom, false)
+        document.querySelector('.nav-pills').addEventListener('click', Handler.difficulty)
+        document.querySelector('.card-footer').addEventListener('click', Handler.submitCustom)
+        //2. 顯示遊戲畫面
+        view.displayFields(numberOfRows, numberOfCols)
+        //3. 避免重複監聽
+        document.querySelector('.wrapper').removeEventListener('click', Handler.status, false)
+        document.querySelector('.fields').removeEventListener('click', Handler.fieldClick, false)
+        document.querySelector('.fields').removeEventListener('contextmenu', Handler.fieldContextmenu, false)
+        //3. 遊戲計時
+        /* 設定格子內容，產生地雷 */
+        document.querySelector('.wrapper').addEventListener('click', Handler.status)
+        //4.1 產生地雷編號
+        model.mines = utility.getRandomNumberArray(numberOfRows, numberOfCols, numberOfMines)
+        if (model.mines.indexOf(selectMine) > -1) {
+            for (let i = 0; i < numberOfRows * numberOfCols; i++) {
+                if (model.mines.indexOf(i) === -1) {
+                    model.mines.splice(model.mines.indexOf(selectMine), 1)
+                    model.mines.push(i)
+                    break
+                }
+            }
+        }
+        //4.2 產生空格子
+        model.fields = Array(numberOfRows * numberOfCols).fill().map(el => {return {number: el, isDigged: false}}) //要用map的原因https://stackoverflow.com/questions/35578478/array-prototype-fill-with-object-passes-reference-and-not-new-instance
+        //4.3 設定格子內容
+        model.fields.forEach((el, idx) => {controller.getFieldData(idx)})
+        //4.4 設定旗子數量
+        model.remainFlags = model.mines.length
+        //4.5 後台檢查
+        utility.deBug()
+        view.renderFlagNumber()
+        //5. 綁定事件監聽器到格子上
+        document.querySelector('.fields').addEventListener('click', Handler.fieldClick)
+        document.querySelector('.fields').addEventListener('contextmenu', Handler.fieldContextmenu)
+    },
     /**
      * setMinesAndFields()
      * 設定格子的內容，以及產生地雷的編號。
@@ -294,7 +338,7 @@ const controller = {
             case 'beginning':
                 GAME.state = 'firstClick'
                 if (model.isMine(field)) {
-                    controller.createGame(GAME.difficulty.height, GAME.difficulty.width, GAME.difficulty.mines)
+                    controller.savePlayer(GAME.difficulty.height, GAME.difficulty.width, GAME.difficulty.mines, field)
                     controller.dig(field)
                 } 
                 else if (model.fields.filter(field => field.isDigged).length === model.fields.length - model.mines.length) {
@@ -366,23 +410,13 @@ const controller = {
     },
     /**
      * gameOver()
-     * 跳出遊戲結束alert
+     * 顯示踩中的地雷
      */
     gameOver(field) {
         document.querySelector('.status').style.background = `url('resource/status/gameover.gif') center center / cover no-repeat`
         view.showMines(field)
         clearInterval(GAME.timer)
         GAME.state = 'gameOver'
-        //使用SweetAlert套件http://lipis.github.io/bootstrap-sweetalert/
-        /*
-        swal({
-            title: "Game Over",
-            button: "restart",
-        })
-        .then(() => {
-            controller.createGame(9, 10)
-        })
-        */
     },
     resetTime() {
         clearInterval(GAME.timer)
