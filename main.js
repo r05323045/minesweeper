@@ -147,8 +147,8 @@ const Handler = {
                         } else if (inputWidth > 30) {
                             inputHeight = 30
                         }
-                        if (isNaN(inputMines)) {
-                            inputMines = Math.floor(Math.random() * (inputHeight * inputWidth - 1) + 1)
+                        if (isNaN(inputMines) || inputMines.trim() === '') {
+                            inputMines = 10
                         } else if (inputMines < 1) {
                             inputMines = 1
                         } else if (inputMines > (inputHeight * inputWidth - 1)) {
