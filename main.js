@@ -3,7 +3,7 @@
  * 用來控制setInterval、state等變數
  * state分別有 尚未開始-initial => 尚未點擊格子-biginning => 點擊第一個格子後-firstClick => 遊戲結束-gameOver
  */
-const GAME = {timer: ()=>{}, state: 'initial', difficulty: {height: 16, width: 30, mines: 99, custom: false}}
+const GAME = {timer: ()=>{}, state: 'initial', difficulty: {height: 9, width: 9, mines: 10, custom: false}}
 const view = {
     /**
      * displayFields()
