@@ -1,6 +1,7 @@
  /**
- * Timer
- * 用來控制view.renderTime的setInterval函式
+ * GAME
+ * 用來控制setInterval、state等變數
+ * state分別有 尚未開始-initial => 尚未點擊格子-biginning => 點擊第一個格子後-firstClick => 遊戲結束-gameOver
  */
 const GAME = {timer: ()=>{}, state: 'initial', difficulty: {height: 16, width: 30, mines: 99, custom: false}}
 const view = {
@@ -152,6 +153,7 @@ const Handler = {
                         document.querySelector('#pills-custom').querySelector('.mines').value = inputMines
                         controller.createGame(GAME.difficulty.height, GAME.difficulty.width, GAME.difficulty.mines)
                     }
+                    $("#difficulty").modal("hide"); 
                 },
     fieldClick : function (event) {
                     if (event.target.matches('.field')) {

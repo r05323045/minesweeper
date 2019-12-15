@@ -10,12 +10,15 @@ html,body {
 }
 .difficulty {
     width: 550px;
+    z-index: 999;
+
 }
 .difficulty .choose{
     border-radius: 20px;
     margin-bottom: 20px;
 }
 .difficulty .card {
+    position: fixed;
     border-radius: 20px;
     margin-bottom: 20px;
     text-align: center;
@@ -51,6 +54,7 @@ html,body {
     box-sizing: border-box;
     width: 306px;
     height: 380px;
+    z-index: 1;
 }
 .wrapper {
     display: flex;
@@ -166,6 +170,7 @@ html,body {
     left: 15px;
     bottom: 15px;
     width: 100%;
+    z-index: 2;
 }
 .field {
     background: #b9b9b9;
