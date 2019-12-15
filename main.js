@@ -487,8 +487,10 @@ const utility = {
         const numberOfRows = GAME.difficulty.height
         const numberOfCols = GAME.difficulty.width
         const check = []
-        Array.from(Array(numberOfRows).keys()).forEach(i => check.push(model.fields.slice(i * numberOfCols, (i+1) * numberOfCols).map(i => i.number)))
-        console.table(check)
+        Array.from(Array(numberOfRows).keys()).forEach(i => {
+            check.push(model.fields.slice(i * numberOfCols, (i+1) * numberOfCols).map(i => i.number))
+        })
+        setTimeout(()=>{console.table(check)}, 1000)
     }
   }
 
