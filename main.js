@@ -84,9 +84,10 @@ const view = {
      * 為了方便新增與移除監聽器，將監聽器儲存在物件中
      */
 const Handler = { 
-    
+    //點擊表情符號
     status : function (event) {
                 if (event.target.matches('.status')) {
+                    //製造點擊效果
                     document.querySelector('.status').style.borderLeft = '5px solid #828282'
                     document.querySelector('.status').style.borderTop = '5px solid #828282'
                     document.querySelector('.status').style.borderRight = '5px solid white'
@@ -163,7 +164,6 @@ const Handler = {
                         controller.resetTime()
                         controller.createGame(GAME.difficulty.height, GAME.difficulty.width, GAME.difficulty.mines)
                     }
-                    $("#difficulty").modal("hide"); 
                 },
     fieldClick : function (event) {
                     if (event.target.matches('.field')) {
@@ -258,6 +258,7 @@ const controller = {
         /* 設定格子內容，產生地雷 */
         document.querySelector('.wrapper').addEventListener('click', Handler.status)
         //4.1 產生地雷編號
+        //從陣列中選取第一個不是地雷的格子與踩到的格子交換
         model.mines = utility.getRandomNumberArray(numberOfRows, numberOfCols, numberOfMines)
         if (model.mines.indexOf(selectMine) > -1) {
             for (let i = 0; i < numberOfRows * numberOfCols; i++) {
