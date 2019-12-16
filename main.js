@@ -3,7 +3,7 @@
  * 用來控制setInterval、state等變數
  * state分別有 尚未開始-initial => 尚未點擊格子-biginning => 點擊第一個格子後-firstClick => 遊戲結束-gameOver
  */
-const GAME = {timer: ()=>{}, state: 'initial', difficulty: {height: 9, width: 9, mines: 10, custom: false}}
+const GAME = {timer: ()=>{}, state: 'initial', difficulty: {height: 9, width: 9, mines: 10, custom: false}, statusClick: false}
 const view = {
     /**
      * displayFields()
@@ -84,21 +84,26 @@ const view = {
      * 為了方便新增與移除監聽器，將監聽器儲存在物件中
      */
 const Handler = { 
+    
     //點擊表情符號
-    status : function (event) {
+    statusMousedown : function (event) {
                 if (event.target.matches('.status')) {
-                    //製造點擊效果
                     document.querySelector('.status').style.borderLeft = '5px solid #828282'
                     document.querySelector('.status').style.borderTop = '5px solid #828282'
                     document.querySelector('.status').style.borderRight = '5px solid white'
                     document.querySelector('.status').style.borderBottom = '5px solid white'
-                    setTimeout(()=>{
-                        document.querySelector('.status').style.borderLeft = '5px solid white'
-                        document.querySelector('.status').style.borderTop = '5px solid white'
-                        document.querySelector('.status').style.borderRight = '5px solid #828282'
-                        document.querySelector('.status').style.borderBottom = '5px solid #828282'}, 200)
-                    controller.createGame(GAME.difficulty.height, GAME.difficulty.width, GAME.difficulty.mines)
+                    GAME.statusClick = true
                 }    
+            },
+    statusMouseup : function (event) {
+            document.querySelector('.status').style.borderLeft = '5px solid white'
+            document.querySelector('.status').style.borderTop = '5px solid white'
+            document.querySelector('.status').style.borderRight = '5px solid #828282'
+            document.querySelector('.status').style.borderBottom = '5px solid #828282'
+            if (event.target.matches('.status') &&  GAME.statusClick === true) {
+                controller.createGame(GAME.difficulty.height, GAME.difficulty.width, GAME.difficulty.mines)
+            }
+            GAME.statusClick = false    
             },
     difficulty : function (event) {
                     if (event.target.matches('.nav-link')) {
@@ -224,11 +229,13 @@ const controller = {
         //2. 顯示遊戲畫面
         view.displayFields(numberOfRows, numberOfCols)
         //3. 避免重複監聽
-        document.querySelector('.wrapper').removeEventListener('click', Handler.status, false)
+        document.querySelector('.wrapper').removeEventListener('mousedown', Handler.statusMousedown, false)
+        document.removeEventListener('mouseup', Handler.statusMouseup, false)
         document.querySelector('.fields').removeEventListener('click', Handler.fieldClick, false)
         document.querySelector('.fields').removeEventListener('contextmenu', Handler.fieldContextmenu, false)
         //3. 遊戲計時
-        document.querySelector('.wrapper').addEventListener('click', Handler.status)
+        document.querySelector('.wrapper').addEventListener('mousedown', Handler.statusMousedown)
+        document.addEventListener('mouseup', Handler.statusMouseup)
         //4. 埋地雷
         controller.setMinesAndFields(numberOfRows, numberOfCols, numberOfMines)
         view.renderFlagNumber()
