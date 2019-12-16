@@ -394,17 +394,15 @@ const controller = {
         const range = []
         for (let i = -1; i < 2; i++) {
             for (let j = -1; j < 2; j++) {
-                if (Math.abs(i) !== Math.abs(j)) {
-                    const row = fieldRow + i
-                    const col = fieldCol + j
-                    if (row >= 0 && row < numberOfRows && col >= 0 && col < numberOfCols) { 
-                        range.push(row * numberOfCols + col)
-                    }
-                } 
+                const row = fieldRow + i
+                const col = fieldCol + j
+                if (row >= 0 && row < numberOfRows && col >= 0 && col < numberOfCols) { 
+                    range.push(row * numberOfCols + col)
+                }
             }
         }
         range.forEach(index => {
-            if (model.fields[index].isDigged === false) {
+            if (model.fields[index].isDigged === false && model.isMine(index) === false) {
                 controller.dig(index)
             }
         })
