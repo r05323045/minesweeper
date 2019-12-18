@@ -3,7 +3,7 @@
  * 用來控制setInterval、state等變數
  * state分別有 尚未開始-initial => 尚未點擊格子-biginning => 點擊第一個格子後-firstClick => 遊戲結束-gameOver
  */
-const GAME = {timer: ()=>{}, state: 'initial', difficulty: {height: 9, width: 9, mines: 10, custom: false}, statusClick: false}
+const GAME = {timer: null, state: 'initial', difficulty: {height: 9, width: 9, mines: 10, custom: false}, statusClick: false}
 const view = {
     /**
      * displayFields()
@@ -171,7 +171,7 @@ const Handler = {
                     }
                 },
     fieldClick : function (event) {
-                    if (event.target.matches('.field')) {
+                    if (GAME.state !== 'gameOver' && event.target.matches('.field') && event.target.matches('.flag') === false) {
                         switch (GAME.state) {
                             case 'beginning':
                                 controller.dig(event.target.id)
@@ -189,7 +189,7 @@ const Handler = {
     fieldContextmenu : function (event) {
                             event.preventDefault()
                             const fieldIdx = Number(event.target.id)
-                            if (event.target.matches('.field') && model.fields[fieldIdx].isDigged === false) {
+                            if (GAME.state !== 'gameOver' && event.target.matches('.field') && model.fields[fieldIdx].isDigged === false) {
                                 switch (GAME.state) {
                                     case 'beginning':
                                     case 'firstClick':
@@ -218,55 +218,18 @@ const controller = {
      * createGame()
      * 根據參數決定遊戲版圖的行列數，以及地雷的數量
      */
-    createGame(numberOfRows, numberOfCols, numberOfMines) {
+    createGame(numberOfRows, numberOfCols, numberOfMines, selectMine = -1) {
         GAME.state = 'beginning'
-        //1. 避免重複監聽
         controller.resetTime()
-        document.querySelector('.nav-pills').removeEventListener('click', Handler.difficulty, false)
-        document.querySelector('.card-footer').removeEventListener('click', Handler.submitCustom, false)
-        document.querySelector('.nav-pills').addEventListener('click', Handler.difficulty)
-        document.querySelector('.card-footer').addEventListener('click', Handler.submitCustom)
-        //2. 顯示遊戲畫面
         view.displayFields(numberOfRows, numberOfCols)
-        //3. 避免重複監聽
-        document.querySelector('.wrapper').removeEventListener('mousedown', Handler.statusMousedown, false)
-        document.removeEventListener('mouseup', Handler.statusMouseup, false)
-        document.querySelector('.fields').removeEventListener('click', Handler.fieldClick, false)
-        document.querySelector('.fields').removeEventListener('contextmenu', Handler.fieldContextmenu, false)
-        //3. 遊戲計時
-        document.querySelector('.wrapper').addEventListener('mousedown', Handler.statusMousedown)
-        document.addEventListener('mouseup', Handler.statusMouseup)
-        //4. 埋地雷
-        controller.setMinesAndFields(numberOfRows, numberOfCols, numberOfMines)
+        controller.setMinesAndFields(numberOfRows, numberOfCols, numberOfMines, selectMine)
         view.renderFlagNumber()
-        //5. 綁定事件監聽器到格子上
-        document.querySelector('.fields').addEventListener('click', Handler.fieldClick)
-        document.querySelector('.fields').addEventListener('contextmenu', Handler.fieldContextmenu)
     },
     /**
      * savePlayer()
      * 拯救第一次就踩到炸彈的玩家
      */
-    savePlayer(numberOfRows, numberOfCols, numberOfMines, selectMine) {
-        GAME.state = 'beginning'
-        //1. 避免重複監聽
-        controller.resetTime()
-        document.querySelector('.nav-pills').removeEventListener('click', Handler.difficulty, false)
-        document.querySelector('.card-footer').removeEventListener('click', Handler.submitCustom, false)
-        document.querySelector('.nav-pills').addEventListener('click', Handler.difficulty)
-        document.querySelector('.card-footer').addEventListener('click', Handler.submitCustom)
-        //2. 顯示遊戲畫面
-        view.displayFields(numberOfRows, numberOfCols)
-        //3. 避免重複監聽
-        document.querySelector('.wrapper').removeEventListener('click', Handler.status, false)
-        document.querySelector('.fields').removeEventListener('click', Handler.fieldClick, false)
-        document.querySelector('.fields').removeEventListener('contextmenu', Handler.fieldContextmenu, false)
-        //3. 遊戲計時
-        /* 設定格子內容，產生地雷 */
-        document.querySelector('.wrapper').addEventListener('click', Handler.status)
-        //4.1 產生地雷編號
-        //從陣列中選取第一個不是地雷的格子與踩到的格子交換
-        model.mines = utility.getRandomNumberArray(numberOfRows, numberOfCols, numberOfMines)
+    savePlayer(numberOfRows, numberOfCols, selectMine) {
         if (model.mines.indexOf(selectMine) > -1) {
             for (let i = 0; i < numberOfRows * numberOfCols; i++) {
                 if (model.mines.indexOf(i) === -1) {
@@ -276,27 +239,18 @@ const controller = {
                 }
             }
         }
-        //4.2 產生空格子
-        model.fields = Array(numberOfRows * numberOfCols).fill().map(el => {return {number: el, isDigged: false}}) //要用map的原因https://stackoverflow.com/questions/35578478/array-prototype-fill-with-object-passes-reference-and-not-new-instance
-        //4.3 設定格子內容
-        model.fields.forEach((el, idx) => {controller.getFieldData(idx)})
-        //4.4 設定旗子數量
-        model.remainFlags = model.mines.length
-        //4.5 後台檢查
-        utility.deBug()
-        view.renderFlagNumber()
-        //5. 綁定事件監聽器到格子上
-        document.querySelector('.fields').addEventListener('click', Handler.fieldClick)
-        document.querySelector('.fields').addEventListener('contextmenu', Handler.fieldContextmenu)
     },
     /**
      * setMinesAndFields()
      * 設定格子的內容，以及產生地雷的編號。
      */
-    setMinesAndFields(numberOfRows, numberOfCols, numberOfMines) {
+    setMinesAndFields(numberOfRows, numberOfCols, numberOfMines, selectMine = -1) {
 
         //1. 產生地雷編號
         model.mines = utility.getRandomNumberArray(numberOfRows, numberOfCols, numberOfMines)
+        if (selectMine > -1) {
+            controller.savePlayer(numberOfRows, numberOfCols, selectMine)
+        } 
         //2. 產生空格子
         model.fields = Array(numberOfRows * numberOfCols).fill().map(el => {return {number: el, isDigged: false}}) //要用map的原因https://stackoverflow.com/questions/35578478/array-prototype-fill-with-object-passes-reference-and-not-new-instance
         //3. 設定格子內容
@@ -350,12 +304,11 @@ const controller = {
     dig(field) {
         field = Number(field)
         model.fields[field].isDigged = true
-        const numberOfRows = GAME.difficulty.height
         switch (GAME.state) {
             case 'beginning':
                 GAME.state = 'firstClick'
                 if (model.isMine(field)) {
-                    controller.savePlayer(GAME.difficulty.height, GAME.difficulty.width, GAME.difficulty.mines, field)
+                    controller.createGame(GAME.difficulty.height, GAME.difficulty.width, GAME.difficulty.mines, field)
                     controller.dig(field)
                 } 
                 else if (model.fields.filter(field => field.isDigged).length === model.fields.length - model.mines.length) {
@@ -375,7 +328,7 @@ const controller = {
                     controller.victory()
                 } 
                 else if (model.fields[field].number === 0){
-                    controller.spreadOcean(field, numberOfRows)
+                    controller.spreadOcean(field, GAME.difficulty.height)
                 } 
                 break;
             }
@@ -454,7 +407,7 @@ const model = {
      */
     fields: [],
 
-    remainFlags: Number,
+    remainFlags: 0,
   
     /**
      * isMine()
@@ -500,4 +453,10 @@ const utility = {
     }
   }
 
+document.querySelector('.nav-pills').addEventListener('click', Handler.difficulty)
+document.querySelector('.card-footer').addEventListener('click', Handler.submitCustom)
+document.querySelector('.wrapper').addEventListener('mousedown', Handler.statusMousedown)
+document.querySelector('.wrapper').addEventListener('mouseup', Handler.statusMouseup)
+document.querySelector('.fields').addEventListener('click', Handler.fieldClick)
+document.querySelector('.fields').addEventListener('contextmenu', Handler.fieldContextmenu)
 controller.createGame(9, 9, 10)
